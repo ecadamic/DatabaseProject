@@ -141,20 +141,22 @@ on Review(CustomerID);
 create index indexBookOrder
 on BOOK_Order(OrderID,ISBN);
 
-drop view if exists NumAuthorBooks;
-create view NumAuthorBooks as
-  select LastN, FirstN, count(ISBN) as NumUniqueBooks
-  from AUTHOR a, BOOK_AUTHOR ba
-  where a.AuthID = ba.AuthID
-  group by LastN;
 
-drop view if exists AvgSpentPerBook;
-create view AvgSpentPerBook as
-  select LastN, FirstN, NumberOfItems, avg(Price) as AvgSpent
-  from CUSTOMER c, BOOK b, BOOK_ORDER bo, ORDERS o
-  where c.CustomerID = o.CustomerID and
-        o.OrderID = bo.OrderID and
-        bo.ISBN = b.ISBN
-  group by LastN;
+drop view if exists NumUniqueBooks;
+create view NumUniqueBooks as
+	select a.AuthID, LastN, count(ISBN) as NumUniqueBooks
+	from AUTHOR a, BOOK_AUTHOR ba
+	where a.AuthID = ba.AuthID
+	group by a.AuthID;
+	
 
 
+drop view if exists AvgSpentPerCustomer;
+create view AvgSpentPerCustomer as
+	select c.CustomerID, LastN, FirstN, Number_Of_Items, avg(Price) as AvgSpent
+	from CUSTOMER c, ORDERS o, BOOK_ORDER bo, BOOK b
+	where c.CustomerID = o.CustomerID
+		and o.OrderID = bo.OrderID
+		and bo.ISBN = b.ISBN
+	group by c.CustomerID;
+	
